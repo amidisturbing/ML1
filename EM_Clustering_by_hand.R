@@ -31,7 +31,10 @@ truth <- rep(c(1, 2), c(25, 25))
 
 # plot the data
 plot(c(x11, x21), c(x12, x22), pch = truth, col = truth)
-round(dist(Xdata), digits = 1)
+
+VEC <- rep(0.4, each=25) 
+dist1 <- Xdata[, 1] - VEC
+SUM_C1 <- abs(sum(dist1[1:25]))
 
 
 
