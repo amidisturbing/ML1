@@ -32,11 +32,10 @@ truth <- rep(c(1, 2), c(25, 25))
 # plot the data
 plot(c(x11, x21), c(x12, x22), pch = truth, col = truth)
 
+#calculate distances to mean in order to compare it to kMeans clustering
 VEC <- rep(0.4, each=25) 
 dist1 <- Xdata[, 1] - VEC
 SUM_C1 <- abs(sum(dist1[1:25]))
-
-
 
 # 02: Simple kmeans clustering with two clusters -------------------------------
 
@@ -45,6 +44,7 @@ plot(Xdata[, 1], Xdata[, 2], col = km.out$cluster, pch=truth)
 table(km.out$cluster, truth)
 
 # The triangles on the left side of the upper cluster are wrongly assigned
+#SUM_C1 < km.out$withinss an der Stelle 1
 
 # 03: EM Clustering ------------------------------------------------------------
 
@@ -97,7 +97,7 @@ Sigma1 <- cov.wt(Xdata, wt = probs[, 1])$cov
 Sigma2 <- cov.wt(Xdata, wt = probs[, 2])$cov
 
 # plot the updated centroids grey points are uncertain
-# the darker the color the higher the probability for cluster ???
+# the darker the color the higher the probability for cluster 2
 plot(c(x11, x21), c(x12, x22), pch=16, col=grey(probs[, 1]), main = "Iterion 1")
 points(c(x11, x21), c(x12, x22), pch=1)
 points(EMmeans11, EMmeans12, pch = "1", col = "red", cex = 1.5)
@@ -165,4 +165,4 @@ plot(c(x11,x21),c(x12,x22),
 points(c(x11,x21),c(x12,x22),pch=1)
 
 # compare the hard clusters with the true cluster values.
-table(???$class, truth)
+table(emclobj$class, truth)
