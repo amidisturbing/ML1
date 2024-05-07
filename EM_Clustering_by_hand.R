@@ -166,3 +166,5 @@ points(c(x11,x21),c(x12,x22),pch=1)
 
 # compare the hard clusters with the true cluster values.
 table(emclobj$class, truth)
+
+#3c
