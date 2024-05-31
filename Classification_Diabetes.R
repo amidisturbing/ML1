@@ -6,11 +6,28 @@
 library(pROC)  # install package if necessary
 
 # 01: load data ----------------------------------------------------------------
-load(???)  # ??? stands for "path/Diabetes.Rda"
+load("/Users/rafaelaneff/Documents/2024/BHT Berlin/ML1/EX/Datasets/Diabetes.Rda")  # ??? stands for "path/Diabetes.Rda"
 
 # 02: explorative data analysis ------------------------------------------------
 # Answer parts (a) to (e) in the worksheet
+#a) How many observations are there?
+dim(Diabetes) #-> 9629 
+#b) obtain the frequency table for diabetes status.
+table(Diabetes$YN)
+#c) What is the mean and standard deviation of BMI and Age?
+mean(Diabetes$BMI) #mean = 26.6586, sd = 7.38
+sd(Diabetes$BMI)
 
+mean(Diabetes$Age) #mean = 37.73538, sd = 21.79
+sd(Diabetes$Age)
+#d) Plot a histogram of BMI and Age, and a scatter plot of the two.
+hist(Diabetes$BMI)
+hist(Diabetes$Age)
+plot(Diabetes$BMI, Diabetes$Age)
+#e) Create a box plot of BMI against YN and BMI against YN.
+boxplot(Diabetes$BMI, Diabetes$YN)
+contrasts(Diabetes$YN)
+boxplot(Diabetes$Age, Diabetes$YN)
 # 03: modeling -----------------------------------------------------------------
 
 # 03a: Train/Test Split ----
@@ -35,7 +52,7 @@ plot(BMI.grid, glm.pred, type = "l", xlab="BMI")
 
 # Question: does the logistic regression Diabetes = 'Yes' or Diabetes = 'No' as
 #           dependent variable? 
-
+summary(glm.obj)
 # 04: Assessment of Classification Quality -------------------------------------
 
 # 04a: Classification matrix ----
@@ -91,19 +108,44 @@ auc(test.roc.obj1)
 # 05: Further modeling ---------------------------------------------------------
 
 # 05a: Repeat the analysis done so far with variable 'Age'
-glm.obj2 <- glm(??? ~ ???, data=???, family=binomial)
+glm.obj2 <- glm(YN ~ Age, data=train, family=binomial)
 glm.obj2$coefficients  # it looks as if older means diabetes is more likely  
 ptest2 <-  predict(glm.obj2, newdata=test, type="response")
-test.roc.obj2  <-  roc(???, ???)
+test.roc.obj2  <-  roc(test$YN, ptest2)
 ggroc(list("BMI"=test.roc.obj1, "Age"=test.roc.obj2))
-auc(roc.obj2)
+auc(test.roc.obj2)
 
 # 05b: repeat analyis with a model containing both BMI and Age 
-glm.obj3 <- glm(???~???,data=???,family=binomial)
+glm.obj3 <- glm(YN ~ Age + BMI ,data = train,family=binomial)
+glm.obj3$coefficients  # it looks as if BMI affects diabetes is more likely than Age, but both do.
+ptest3 <-  predict(glm.obj3, newdata=test, type="response")
+test.roc.obj3  <-  roc(test$YN, ptest3)
+ggroc(list("BMI"=test.roc.obj1, "Age"=test.roc.obj2, "Age+BMI"=test.roc.obj3))
+auc(test.roc.obj3)
 
-# Add further comments and code ....
-# Have fun!
+alpha <- 0.5 
+fit3 <- fitted(glm.obj3)
+HiRisk3 <- fit3 > alpha
+table(HiRisk3)
+tab3 <- table(train$YN, HiRisk3, dnn = c("observed", "predicted"))
+print(tab3)
 
+# The following 3 commands calculate the sensitivity, specificity and accuracy.
+# Which is which?
+(tab3[1, 1] + tab3[2, 2])/sum(tab3)#accuracy
+tab3[1, 1]/sum(tab3[1, ])#specificity
+tab3[2, 2]/sum(tab3[2, ])#sensitivity
 
+#change cut off probability to 0.10
+alpha <- 0.19 
+fit4 <- fitted(glm.obj3)
+HiRisk4 <- fit4 > alpha
+table(HiRisk4)
+tab4 <- table(train$YN, HiRisk4, dnn = c("observed", "predicted"))
+print(tab4)
+
+(tab4[1, 1] + tab4[2, 2])/sum(tab4)
+tab4[1, 1]/sum(tab4[1, ])
+tab4[2, 2]/sum(tab4[2, ])
 
 
