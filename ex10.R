@@ -10,14 +10,19 @@ train <-Diabetes[-testidx, ]
 
 tree.diabetes <- rpart(YN ~ Age + BMI, data = train)
 rpart.plot(tree.diabetes)
-tree.diabetes.full <- rpart(YN ~ Age + BMI , data = train, cp = 0) 
+tree.diabetes.full <- rpart(YN ~ . , data = train, cp = 0) 
 rpart.plot(tree.diabetes.full)
 cptable <- tree.diabetes.full$cptable
 minDeviance <- which.min(cptable[ , "xerror"])
 dotted <- cptable[minDeviance, "xerror"] + cptable[minDeviance, "xstd"] 
+abline(h = dotted, col ="red")
+plotcp(tree.diabetes.full)
+
 # which is the first row less than this value
-cpPruning <- cptable[cptable[, "xerror"] < dotted,][1]
+cpPruning <- cptable[cptable[, "xerror"] < dotted,][1, "CP"]
 cpPruning
+
+
 cptable #find cpvalue without rounding
 ##FRAGE! cpvalue kann nicht stimmen
 prune.diabetes <- prune(tree.diabetes.full, cp = 0.0046) 
